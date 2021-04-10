@@ -9,10 +9,8 @@ import Contract.Task;
 import Contract.TaskList;
 import Contract.TaskObject;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.util.Pair;
 import Contract.CalculateGCD;
 import Contract.CalculatePi;
 import Contract.CalculatePrimes;
@@ -42,35 +40,7 @@ public class Server implements DataProvider {
         return tl;
     }
 
-    /*
-    @Override
-    public TaskObject getTaskByClassName(String className) {
-        synchronized (this) {
-            TaskObject to = null;
 
-            System.out.println("getTaskByClassName " + availableJobs.size());
-            try {
-                for (int i = 0; i < availableJobs.size(); i++) {
-                    Pair<Integer, TaskObject> c = availableJobs.get(i);
-//				System.out.println(c.getValue().getTObject().getClass());	
-                    if (c != null && c.getValue().getTObject().getClass().equals(Class.forName("taskmaster.tasks." + className))) {
-
-                        availableJobs.remove(i);
-                        processingJobs.addLast(c);
-                        to = c.getValue();
-                        System.out.println("Found task by class name");
-                        break;
-                    }
-                }
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            return to;
-
-        }
-    }
-     */
     @Override
     public Task getTaskByClassName(String className) {
         Task t = null;
@@ -91,15 +61,15 @@ public class Server implements DataProvider {
      */
     public void genAvTasks() {
 
-        String[] tasks = {"CalculatePi upto 10 digits", "CalculatePi upto 4 digits", "CalculatePrimes upto 100", "CalculateGCD of 5 and 7"};
+        String[] tasks = {"Calculate value of Pi upto 10 digits", "Calculate value of Pi upto 4 digits", "Is prime: 100", "CalculateGCD of 5 and 7"};
         String[] taskClasses = {"CalculatePi", "CalculatePrimes", "CalculateGCD"};
         tl.setAvailableTasks(tasks);
         tl.setTaskClassName(taskClasses);
     }
 
     @Override
-    public void completeJob(TaskObject o, Object res) {
-        compJobs.put(o, res);
+    public void completeJob(TaskObject o) {
+//        compJobs.put(o, res);
     }
 
     public void initServer() {
@@ -143,7 +113,7 @@ public class Server implements DataProvider {
                 break;
             case 2:
                 CalculatePrimes pr = new CalculatePrimes();
-                pr.setUpto(100);
+                pr.setNum(100);
                 t = pr;
                 break;
             case 3:

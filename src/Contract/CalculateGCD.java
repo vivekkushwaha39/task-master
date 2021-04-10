@@ -15,7 +15,7 @@ public class CalculateGCD implements Task, Serializable {
 
     long num1;
     long num2;
-
+    long res=0;
     public void setNum1(long num1) {
         this.num1 = num1;
     }
@@ -26,12 +26,27 @@ public class CalculateGCD implements Task, Serializable {
 
     @Override
     public void executeTask() {
-
+        res = CalculateGCD.calculateGCD(num1, num2);
     }
 
     @Override
     public Object getResult() {
-        return "0";
+        return res;
+    }
+
+    public static long calculateGCD(long a, long b) {
+        if (a == 0) {
+            return b;
+        } else {
+            while (b != 0) {
+                if (a > b) {
+                    a = a - b;
+                } else {
+                    b = b - a;
+                }
+            }
+            return a;
+        }
     }
 
 }

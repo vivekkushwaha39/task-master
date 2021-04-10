@@ -6,7 +6,6 @@
 package taskmaster;
 
 import Contract.Task;
-import Contract.TaskObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,8 +18,8 @@ import java.net.Socket;
 import java.net.URL;
 
 /**
- *
- * @author vfi
+ * Class for listening file clients
+ * for downloading class files
  */
 public class FileListener {
 
@@ -28,17 +27,22 @@ public class FileListener {
 
     private DataProvider provider;
     private boolean keepListen = true;
+    private int port = 1235;
 
     public FileListener(DataProvider provider) {
         this.provider = provider;
     }
 
+    /**
+     * function to create server socket
+     * @return boolean is com initialized
+     */
     public boolean initComm() {
         boolean ret = false;
 
         try {
 
-            server = new ServerSocket(1235);
+            server = new ServerSocket(this.port);
             server.setReuseAddress(true);
 
             ret = true;
@@ -50,13 +54,13 @@ public class FileListener {
     }
 
     /**
-     * Listen for connections forever
+     * Listen for new connections forever
      */
     public void startListening() {
         while (keepListen) {
             Socket cliSocket;
             try {
-                System.out.println("Waiting for new file client");
+                System.out.printf("Waiting for new file client on port: %d\n", this.port);
                 cliSocket = server.accept();
                 System.out.println("New file client connected");
                 ClientHandler handler = new ClientHandler(cliSocket, provider);
@@ -68,6 +72,9 @@ public class FileListener {
         }
     }
 
+    /**
+     * class to handle clients in separate threads
+     */
     private class ClientHandler implements Runnable {
 
         Socket cliSock = null;
@@ -85,6 +92,14 @@ public class FileListener {
             return url;
         }
 
+        /**
+         * Function to send class file to clients.
+         * Protocol:
+         * S->C: Send file size
+         * C->S: OK (ACK)
+         * S->C: Sending file bytes as streams.
+         * 
+         */
         private boolean sendFile(File f) {
             boolean ret = true;
             if (f.exists() == false) {
@@ -129,14 +144,15 @@ public class FileListener {
         public void run() {
             boolean wait = true;
             try {
+                rdr = new BufferedReader(new InputStreamReader(cliSock.getInputStream()));
+                oOutS = new ObjectOutputStream(cliSock.getOutputStream());
+
                 while (wait == true) {
-                    rdr = new BufferedReader(new InputStreamReader(cliSock.getInputStream()));
-                    oOutS = new ObjectOutputStream(cliSock.getOutputStream());
                     String data = rdr.readLine();
                     System.out.println("data for fileserver " + data);
                     switch (data) {
-                        case "GET_TASK":
-                            data = rdr.readLine();
+                        case "GET_TASK": // Client reuesting a particular class file.
+                            data = rdr.readLine(); // Get Task's class name from client
                             Task to = provider.getTaskByClassName(data);
                             URL fileUrl = getTaskClassUrl(to);
                             File classFile = new File(fileUrl.getPath());
@@ -156,9 +172,10 @@ public class FileListener {
                                 break;
                             }
 
-                            oOutS.writeObject(to);
+                            oOutS.writeObject(to); 
                             oOutS.flush();
                             cliSock.close();
+                            System.out.println("file sock closed");
                             wait = false;
                             break;
                         default:
@@ -168,7 +185,8 @@ public class FileListener {
 
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Error:" + e.getMessage());
+//                e.printStackTrace();
             }
         }
 

@@ -10,6 +10,6 @@ import Contract.TaskObject;
 public interface DataProvider {
 	public Contract.TaskList getTaskList();
 	public Contract.Task getTaskByClassName(String className);
-	public void completeJob(TaskObject o, Object res);
+	public void completeJob(TaskObject o);
         public TaskObject fillTaskObject(TaskObject to);
 }

@@ -13,35 +13,32 @@ import java.util.LinkedList;
  *
  *
  */
-public class CalculatePrimes implements Task,Serializable {
+public class CalculatePrimes implements Task, Serializable {
 
-	int upto=100;
-	LinkedList<Integer> result = new LinkedList<>();
+    int num = 100;
+    boolean res = false;
+    
+    public void setNum(int n) {
+        this.num = n;
+    }
 
-	public void setUpto(int upto) {
-		this.upto = upto;
-	}
+    @Override
+    public void executeTask() {
+        res = CalculatePrimes.isPrime(num);
+    }
 
-	
-	@Override
-	public void executeTask() {
-		for (int i = 2; i <= upto; i++) {
-			int c = 0;
-			for (int j = 1; j <= i; j++) {
-				if (i % j == 0) {
-					c++;
-				}
-			}
+    public static boolean isPrime(int number) {
+        for (int i = 2; i < number; i++) {
+            if (number % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-			if (c == 2) {
-				result.addLast(i);
-			}
-		}
-	}
-
-	@Override
-	public Object getResult() {
-		return result;
-	}
+    @Override
+    public Object getResult() {
+        return res;
+    }
 
 }

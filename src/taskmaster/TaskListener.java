@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Random;
 
 /**
  * Class for managing sockets i.e. multi-threaded server
@@ -22,6 +23,7 @@ public class TaskListener {
 
     private DataProvider provider;
     private boolean keepListen = true;
+    private int port = 1234;
 
     public TaskListener(DataProvider provider) {
         this.provider = provider;
@@ -32,7 +34,7 @@ public class TaskListener {
 
         try {
 
-            server = new ServerSocket(1234);
+            server = new ServerSocket(this.port);
             server.setReuseAddress(true);
 
             ret = true;
@@ -50,9 +52,10 @@ public class TaskListener {
         while (keepListen) {
             Socket cliSocket;
             try {
-                System.out.println("Waiting for new client");
+
+                System.out.printf("Waiting for new task client on port: %d\n", this.port);
                 cliSocket = server.accept();
-                System.out.println("New client");
+                System.out.println("New task client accepted");
                 ClientHandler handler = new ClientHandler(cliSocket, provider);
                 Thread t = new Thread(handler);
                 t.start();
@@ -80,14 +83,6 @@ public class TaskListener {
             boolean wait = true;
             System.out.println("Thread started");
             try {
-
-                /**
-                 * Wait for messages from client flow.. S: server C: client
-                 * C->S: "GET_TASK_LIST" S->C: Send TaskList Object C->S:
-                 * "GET_TASK" C->S: "Task class name" S->C: Send .class file
-                 * size C->S: "OK" S->C: Send .class FIle C->S: "OK" S->C: Task
-                 * Object C->S: Result object
-                 */
                 ObjectInputStream ois = new ObjectInputStream(cSock.getInputStream());
                 ObjectOutputStream oOutS = new ObjectOutputStream(cSock.getOutputStream());
 
@@ -120,18 +115,19 @@ public class TaskListener {
                             }
                             break;
                         case "RESULT": //read result object from client
-                            //ObjectInputStream oIs = new ObjectInputStream(cSock.getInputStream());
+
                             System.out.println("Reading result");
                             TaskObject res = (TaskObject) ois.readObject();
-                            System.out.println("Reading done");
-                            // TODO: remove this logic to add into pool
-                            p.completeJob(res, res.getTObject().getResult());
-                            res.setCredit(1000);
+                            System.out.println("Reading done result is " + res.getTObject().getResult().toString());
+                            p.completeJob(res);
+                            int cred = new Random().nextInt(5000);
+                            System.out.println("Tassk completed, Credit assigned: " + cred);
+                            res.setCredit(cred);
                             oOutS.writeObject(res);
                             wait = false;
                             break;
                         default:
-                            System.out.println("TaskS Server command not understood");
+                            System.out.println("Task Server command not understood");
                     }
                 }
 
