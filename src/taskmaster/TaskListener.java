@@ -69,7 +69,6 @@ public class TaskListener {
 
         private Socket cSock = null;
         DataProvider p;
-        TaskObject to = null;
 
         public ClientHandler(Socket s, DataProvider p) {
             this.cSock = s;
@@ -105,55 +104,6 @@ public class TaskListener {
                             oOutS.flush();
                             wait = false;
                             break;
-                        /*case "GET_TASK": // Send .class file and Task Object
-                            System.out.println("Get TASK request");
-                            rdr = new BufferedReader(new InputStreamReader(cSock.getInputStream()));
-                            System.out.println("reading the class name");
-                            String clsName = rdr.readLine();
-                            System.out.println("Class nameis " + clsName);
-                            to = p.getTaskByClassName(clsName);
-                            if (to == null) {
-                                System.out.println("to is null");
-                                cSock.close();
-                                break;
-                            }
-                            URL url = to.getTObject().getClass().getResource(to.getTObject().getClass().getSimpleName() + ".class");
-                            System.out.println(url.getPath());
-                            System.out.println(to.getTObject().getClass().getSimpleName());
-                            File f = new File(url.getPath());
-                            Long fLenth = f.length();
-                            oOutS = new ObjectOutputStream(cSock.getOutputStream());
-                            oOutS.writeObject(fLenth);
-                            oOutS.flush();
-                            System.out.println("Size written " + fLenth);
-                            String conf = rdr.readLine();
-                            if (conf.equals("OK")) {
-                                byte[] buffer = new byte[1024];
-                                int read = 0;
-                                FileInputStream fIS = new FileInputStream(f);
-                                while ((read = fIS.read(buffer)) > 0) {
-                                    System.out.println("writing bytes " + read);
-                                    oOutS.write(buffer, 0, read);
-                                }
-                                oOutS.flush();
-                            } else {
-                                cSock.close();
-                                wait = false;
-                                break;
-                            }
-                            System.out.println("File Sent");
-                            String conf2 = rdr.readLine();
-                            if (conf2.equals("OK") == false) {
-                                cSock.close();
-                                wait = false;
-                                break;
-                            }
-
-                            System.out.println("ACK recieved");
-                            oOutS.writeObject(to);
-                            oOutS.flush();
-                            System.out.println("Task Object is written");
-                            break;*/
                         case "FILL_TASK":
                             TaskObject to = (TaskObject) ois.readObject();
                             if (to == null) {
@@ -176,7 +126,8 @@ public class TaskListener {
                             System.out.println("Reading done");
                             // TODO: remove this logic to add into pool
                             p.completeJob(res, res.getTObject().getResult());
-                            ois.close();
+                            res.setCredit(1000);
+                            oOutS.writeObject(res);
                             wait = false;
                             break;
                         default:

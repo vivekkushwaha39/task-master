@@ -155,10 +155,11 @@ public class FileListener {
                                 cliSock.close();
                                 break;
                             }
-                            
+
                             oOutS.writeObject(to);
                             oOutS.flush();
                             cliSock.close();
+                            wait = false;
                             break;
                         default:
                             System.out.println("FileServer: command not understood");

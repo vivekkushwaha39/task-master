@@ -75,7 +75,7 @@ public class Server implements DataProvider {
     public Task getTaskByClassName(String className) {
         Task t = null;
         try {
-            t = (Task) Class.forName("taskmaster.tasks." + className).newInstance();
+            t = (Task) Class.forName("Contract." + className).newInstance();
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
@@ -125,6 +125,8 @@ public class Server implements DataProvider {
     @Override
     public TaskObject fillTaskObject(TaskObject to) {
         int tid = to.getTaskID();
+        Task t = getTaskByID(tid);
+        to.setTObject(t);
         return to;
     }
 
