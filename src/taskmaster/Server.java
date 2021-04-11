@@ -61,7 +61,15 @@ public class Server implements DataProvider {
      */
     public void genAvTasks() {
 
-        String[] tasks = {"Calculate value of Pi upto 10 digits", "Calculate value of Pi upto 4 digits", "Is prime: 100", "CalculateGCD of 5 and 7"};
+        String[] tasks = {
+            "Calculate value of Pi upto 50 decimal digits",
+            "Calculate prime from 1 to 70",
+            "Calculate GCD of 128 and 76",
+            "Calculate value of Pi upto 70 decimal digits",
+            "Calculate prime from 1 to 100",
+            "Calculate GDC of 252 and 24"
+        
+        };
         String[] taskClasses = {"CalculatePi", "CalculatePrimes", "CalculateGCD"};
         tl.setAvailableTasks(tasks);
         tl.setTaskClassName(taskClasses);
@@ -105,22 +113,35 @@ public class Server implements DataProvider {
 
         switch (id) {
             case 0:
-            case 1:
                 CalculatePi pi = new CalculatePi();
-                int upto = (id == 0) ? 10 : 4;
-                pi.setUpto(upto);
+                pi.setUpto(50);
                 t = pi;
                 break;
+            case 1:
+                CalculatePrimes pr1 = new CalculatePrimes();
+                pr1.setNum(50);
+                t=pr1;
+                break;
             case 2:
-                CalculatePrimes pr = new CalculatePrimes();
-                pr.setNum(100);
-                t = pr;
+                CalculateGCD gcd1 = new CalculateGCD();
+                gcd1.setNum1(128);
+                gcd1.setNum2(76);
+                t=gcd1;
                 break;
             case 3:
+                CalculatePi pi2 = new CalculatePi();
+                pi2.setUpto(70);
+                t = pi2;
+                break;
+            case 4:
+                CalculatePrimes pr2 = new CalculatePrimes();
+                pr2.setNum(100);
+                t=pr2;
+                break;
             default:
                 CalculateGCD gcd = new CalculateGCD();
-                gcd.setNum1(5);
-                gcd.setNum2(7);
+                gcd.setNum1(252);
+                gcd.setNum2(24);
                 t = gcd;
                 break;
 

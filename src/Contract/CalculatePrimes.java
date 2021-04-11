@@ -5,7 +5,6 @@
  */
 package Contract;
 
-import Contract.Task;
 import java.io.Serializable;
 import java.util.LinkedList;
 
@@ -16,15 +15,20 @@ import java.util.LinkedList;
 public class CalculatePrimes implements Task, Serializable {
 
     int num = 100;
-    boolean res = false;
-    
+    LinkedList<Integer> res = new LinkedList<>();
+
     public void setNum(int n) {
         this.num = n;
     }
 
     @Override
     public void executeTask() {
-        res = CalculatePrimes.isPrime(num);
+        for (int i = 1; i <= num; i++) {
+            if( CalculatePrimes.isPrime(i)){
+                res.add(i);
+            }
+        }
+
     }
 
     public static boolean isPrime(int number) {
